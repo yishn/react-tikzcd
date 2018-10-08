@@ -13,15 +13,21 @@ function renderEdge(vnode, co = false) {
     if (direction == null) return ''
 
     let labelPosition = vnode.props.labelPosition || 'left'
+    let labelPositionLongitudinal = vnode.props.labelPositionLongitudinal || 'center'
 
-    if (co === !alt && labelPosition !== 'inside')
-        labelPosition = labelPosition === 'left' ? 'right' : 'left'
+    if (co === !alt) {
+        if (labelPosition !== 'inside')
+            labelPosition = labelPosition === 'left' ? 'right' : 'left'
+        if (labelPositionLongitudinal !== 'center')
+            labelPositionLongitudinal = ({nearstart: 'nearend', verynearstart: 'verynearend', nearend: 'nearstart', verynearend: 'verynearstart'})[labelPositionLongitudinal]
+    }
 
     let p = ({left: '', right: "'", inside: ' description'})[labelPosition]
+    let pLongitudinal = ({center: '', nearstart: ', near start', verynearstart: ', very near start', nearend: ', near end', verynearend: ', very near end'})[labelPositionLongitudinal]
     let [w1, w2] = value != null
         && needWrapChars.some(c => value.includes(c))
         ? ['{', '}'] : ['', '']
-    let valueArg = value != null ? `"${w1}${value}${w2}"${p}` : null
+    let valueArg = value != null ? `"${w1}${value}${w2}"${p}${pLongitudinal}` : null
     let args = ['', valueArg, ...(vnode.props.args || [])].filter(x => x != null).join(', ')
 
     return `\\arrow[${direction}${args}]`
